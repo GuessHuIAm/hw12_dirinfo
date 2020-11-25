@@ -1,17 +1,39 @@
+#include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <dirent.h>
+#include <errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 
-int main(){
+int main(int argc, char **argv){
+	char buffer[100];
+
+	if (argc == 2){
+        	strncpy(buffer, argv[1], sizeof(buffer) - 1);
+    	}
+	else{
+		printf("Enter a directory: ");
+		fgets(buffer, sizeof(buffer), stdin);
+	}
+
+	// getting rid of that new-line character
+	char *position;
+	if ((position = strchr(buffer, '\n')) != NULL){
+		*position = '\0';
+	}
+
 	DIR *d;
 	struct dirent *entry;
 	struct stat sb;
 
-	d = opendir(".");
+	d = opendir(buffer);
+	if (d == NULL){
+		printf("Error: %s\n", strerror(errno));
+	}
 	entry = readdir(d);
 
-	printf("Statistics for directory: .\n");
+	printf("Statistics for directory: %s\n", buffer);
 
 	int s = 0;
 	while (entry != NULL){
